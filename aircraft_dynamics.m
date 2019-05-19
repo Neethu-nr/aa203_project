@@ -1,21 +1,21 @@
-function dS = aircraft_dynamics(S)
+function dS = aircraft_dynamics(t, S, alpha, mu)
   
-    global W = 9200; % in kg
-    global S =27.87; % in m.sq
+    global W;
+    global Surface_area;
     global mu_g;
     global rE;
-    global rho_air; %density of air
-    g = mu_g/((rE + y)*(rE + y)); % gravitational constant
+    global rho_air; 
     
     % Wind parameters
-    global Vw = 0;    
-    global chiw = 0;
+    global Vw;    
+    global chiw;
 
     x = S(1); y = S(2); h = S(3);
     V = S(4);gamma = S(5);chi= S(6);
+    g = mu_g/((rE + h)*(rE + h)); 
     
     % Drag and Lift calculation
-    qS = 0.5 * rho_air*V*V*S;
+    qS = 0.5 * rho_air * V*V * Surface_area;
     [CL, CD] = find_coeff(alpha);
     L = CL * qS;
     D = CD * qS;

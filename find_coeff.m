@@ -1,4 +1,5 @@
 function [CL, CD] = find_coeff(alpha)
+    alpha = alpha * 180 /pi;
     if (alpha > 25)
         CL = NaN;
         CD = NaN;

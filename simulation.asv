@@ -1,0 +1,26 @@
+% Global values
+global W = 9200; % in kg
+global S =27.87; % in m.sq
+global mu_g = 6.67408e-11; % grain m.3kg.-1s.-2
+global rE = 6378.1; %in radius of earth in km
+global rho_air = 1.225 ; % density of air in kg/m3 
+g = mu_g/((rE + y)*(rE + y)); % gravitational constant
+
+% Wind parameters
+global Vw = 0;    
+global chiw = 0;
+
+
+
+
+tspan = [0 5];
+
+% initial conditions
+x0 = 0; y0 = 0; h0 = 100;
+V0 = 100; % m/s
+gamma0 = 0.26; % radians
+chi0 = 0; % radians
+S0 = [x0 ; y0; h0; 
+      V0; gamma0; chi0];
+  
+[t,S] = ode45(@(t,S) aircraft_dynamics(t,S,alpha,mu),tspan,S0);
