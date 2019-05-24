@@ -1,7 +1,7 @@
 function [CL, CD] = find_coeff(alpha)
 
     %Within constraints
-    assert(alpha >= 25 && alpha >= 0)
+    assert(alpha <= 25 && alpha >= 0)
     alpha = alpha * 180 /pi;
     
     table_alpha = [0 5 10 15 20 25];
