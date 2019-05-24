@@ -28,5 +28,5 @@ chi0 = 0; % radians
 S0 = [x0 ; y0; h0; 
       V0; gamma0; chi0];
  
-[t,S] = ode45(@(t,S) aircraft_dynamics(t,S,alpha,mu),tspan,S0);
+[t,S] = ode45(@(t,S) aircraft_dynamics(S,alpha,mu),tspan,S0);
 plot3(S(:,1),S(:,2),S(:,3))

@@ -1,4 +1,4 @@
-function dS = aircraft_dynamics(t, S, alpha, mu)
+function dS = aircraft_dynamics(S, alpha, mu)
   
     global W;
     global Surface_area;
