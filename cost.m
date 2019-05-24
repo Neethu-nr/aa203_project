@@ -2,7 +2,7 @@
 
 function c = cost(var)
 
-[x,y,h,V,gamma,chi,alpha,mu] = varToState(varInit);
+[x,y,h,V,gamma,chi,alpha,mu] = varToState(var);
 
 % cost
 c = x(end);

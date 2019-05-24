@@ -10,7 +10,7 @@ h = var(2*N+3:3*N+3);
 V = var(3*N+4:4*N+4);
 gamma = var(4*N+5:5*N+5);
 chi = var(5*N+6:6*N+6);
-alpha = var(6*N+7:7*N+7);
-mu = var(7*N+8:8*N+8);
+alpha = var(6*N+7:7*N+6);
+mu = var(7*N+7:8*N+6);
 
 end
