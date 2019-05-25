@@ -17,8 +17,9 @@ global chiw;chiw = 0;  % Direction of wind in rad
 % Control values
 alpha = 0; % angle of attack in radians
 mu = 0.1;   % rolling angle in radians
+dt = 4;
 
-tspan = 0:10:100;
+tspan = 0:dt:100;
 %tspan = [0 100];
 
 % initial conditions
@@ -29,13 +30,13 @@ chi0 = 0; % radians
 S0 = [x0 ; y0; h0; 
       V0; gamma0; chi0];
  
-%[t,S] = ode45(@(t,S) aircraft_dynamics(S,alpha,mu),tspan,S0);
+% [t,S] = ode45(@(t,S) aircraft_dynamics(S,alpha,mu),tspan,S0);
 S = zeros(length(tspan),6);
 S(1,:) = S0;
 
-for i = 1:length(tspan)
+for i = 1:length(tspan)-1
    
-    S(i+1,:) = S(i,:) + 10 * aircraft_dynamics(S(i,:),alpha,mu)';
+    S(i+1,:) = S(i,:) + dt * aircraft_dynamics(S(i,:),alpha,mu)';
     
 end
 
