@@ -24,13 +24,16 @@ global mulim;
 global alphaMax;
 
 [x,y,h,V,gamma,chi,alpha,mu] = varToState(var);
-
+hsafe = 100;
 
 % Put here constraint inequalities
 c = [];
 
-% Computing dynamical constraints via the trapezoidal rule
+musafe = 5 / 180 * pi;
 h_step = 1.0*T/(1.0*N);
+h_l_speed = -4;
+h_h_speed = 0.5;
+
 for i = 1:N
     % Provide here dynamical constraints via the trapeziodal formula
     
@@ -42,6 +45,17 @@ for i = 1:N
     indices = length(S)*(i-1)+1:length(S)*i;
     
     ceq(indices) = Snext-S-h_step*dS;
+    
+    h_dot = dS(3);
+    
+   if h(i) <= hsafe 
+       c = [c musafe-mu(i) mu(i)-musafe];
+       c = [c h_dot-h_h_speed h_l_speed-h_dot];
+   else
+       c = [c 0 0];
+       c = [c 0 0];
+   end
+    
 end
 
 % Put here initial and final conditions
