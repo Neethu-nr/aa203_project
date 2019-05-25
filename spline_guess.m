@@ -1,12 +1,12 @@
-function guess = spline_guess(x0,xf,m,N)
+function guess = spline_guess(x0,xf,m,N,plot_status)
 
     dist = norm(x0(1:2)-xf(1:2));
-    offset = dist / 2 - x0(1);
+    offset = (x0(1) + xf(1)) / 2;
     
     dt = 0.01;
     t = pi:-dt:dt;
 
-    x = dist / 2 * cos(t) + offset;
+    x = dist / 2 * cos(t) - offset - 0.2 * dist * sin(t);
     y = dist / 2 * sin(t).*sin(1/2*t).^m;
     z = linspace(x0(3),xf(3),length(t));
     
@@ -46,10 +46,14 @@ function guess = spline_guess(x0,xf,m,N)
     y_sample(end) = z(end);
     z_sample(end) = z(end);
     
-%     hold on
-%     plot3(x,y,z,'r')
-%     plot3(x_sample,y_sample,z_sample,'.')
-%     axis equal
+    if plot_status
+    
+        hold on
+        plot3(x,y,z,'r')
+        plot3(x_sample,y_sample,z_sample,'.')
+        axis equal
+    
+    end
     
     Vmin = 100;
     V = Vmin * ones(1,N+1);

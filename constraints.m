@@ -51,9 +51,9 @@ for i = 1:N
    if h(i) <= hsafe 
        c = [c musafe-mu(i) mu(i)-musafe];
        c = [c h_dot-h_h_speed h_l_speed-h_dot];
+       c = [c V(i)-Vmin];
    else
-       c = [c 0 0];
-       c = [c 0 0];
+       c = [c 0 0 0 0 0];
    end
     
 end
@@ -64,5 +64,9 @@ ceq(2+6*N) = y(1) - y0;
 ceq(3+6*N) = h(1) - h0;
 ceq(4+6*N) = V(1) - V0;
 ceq(8+6*N) = h(end) - hf;
+ceq(9+6*N) = y(end) - yf;
+ceq(10+6*N) = chi(1) - chi0;
+ceq(11+6*N) = gamma(1) - gamma0;
+ceq(12+6*N) = chi(end) - chif;
 
 end

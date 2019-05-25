@@ -22,13 +22,12 @@ function dS = aircraft_dynamics(S, alpha, mu)
     D = CD * qS;
     
     % Derivative calculation
-    xdot = V*cos(gamma)*cos(chi) + Vw*cos(chiw); 
+    xdot = V*cos(gamma)*cos(chi) + Vw*cos(chiw);
     ydot = V*cos(gamma)*sin(chi) + Vw*sin(chiw);
     hdot = V*sin(gamma);
     Vdot = -g/W*(D + W*sin(gamma));
     gammadot = g/V*(L/W*cos(mu) - cos(gamma));
     chidot = g*L*sin(mu) / (V*cos(gamma)*W);
     
-    dS =[xdot;  ydot;   hdot;
-         Vdot; gammadot; chidot];
+    dS = [xdot;  ydot; hdot; Vdot; gammadot; chidot];
 end
