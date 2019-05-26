@@ -13,7 +13,7 @@ global rho_air;rho_air = 1.225 ;        % density of air in kg/m3
 global Vw;Vw = 10;    % Magnitude of wind in m/s
 global chiw;chiw = 0;  % Direction of wind in rad
 
-global N; N = 50; % Scenario
+global N; N = 40; % Scenario
 global T; T = 165;
 global yf; yf = 0;
 global hf; hf = 0;
@@ -36,7 +36,7 @@ uInit = zeros(2*N,1); % Initialization on the control
 %uInit(N+1:end) = 0.1 * ones(N,1);
 sInit = ones(6*(N+1),1); % Initialization on the state
 
-if false
+if true
     sInit(1:6*N+6) = guess;
 else
     res = matfile('res.mat'); 
@@ -58,11 +58,8 @@ convergence % = 1, good
 
 save('res.mat','var');
 
-figure
-hold on
-plot3(var(1:N+1),var(N+2:2*N+2),var(2*N+3:3*N+3))
-%plot3(guess(1:N+1),guess(N+2:2*N+2),guess(2*N+3:3*N+3))
-axis equal
+plot_traj(var)
+plot3(guess(1:N+1),guess(N+2:2*N+2),guess(2*N+3:3*N+3))
 load gong.mat;
 sound(y);
 
