@@ -13,15 +13,12 @@ class Airplane_Env:
         self.rho_air = 1.225
         self.tau = 2.0  # seconds between state updates
 
-        # x,y and h at which to fail the episode
-        self.h_threshold = 0
-        self.x_threshold = -1000
-        self.y_threshold = 2500
         self.goal = [5000,0]
         self.traj = np.array([])
+        self.controlls  = np.array([])
 
         #x,y,h,V,gamma,chi
-        self.init_pos = np.array([0.0,0.0,10000.0,100.0,0.26,np.pi], dtype=np.float32)
+        self.init_pos = np.array([0.0,0.0,1000.0,100.0,0.26,np.pi], dtype=np.float32)
         self.reset()
         self.old_alpha = 0
         self.old_mu = 0
@@ -31,39 +28,40 @@ class Airplane_Env:
     def step(self, action):
 
         alpha,mu = self.action_to_control(action)
+        #self.old_alpha = alpha
+        #self.old_mu = mu
 
         self.old_state = self.state
-        
-        dt = 0.5
 
-        #for i in range(int(self.tau/dt)):
-        #    self.state = self.state + dt * self.dynamics(self.state,alpha,mu)
         self.state = self.state + self.tau * self.dynamics(self.state,alpha,mu)
         self.traj = np.append(self.traj,[self.state],axis=0)
+        self.controlls = np.append(self.controlls,np.array([alpha,mu])*90.0,axis=0)
         
-        done = (self.state[2] <= 0) #or self.state[0] <= self.x_threshold or abs(self.state[1]) > self.y_threshold)
+        done = (self.state[2] <= 0)
         done = bool(done)
 
-        #dist_to_goal = np.linalg.norm(self.goal-self.state[0:2])
-        #original_dist = np.linalg.norm(self.goal-self.init_pos[0:2])
-
-        #reward = 1000 * (1 - dist_to_goal/original_dist) - ((self.old_alpha - alpha) ** 2 + (self.old_mu - mu) ** 2)
-        reward = self.state[0]# - abs(self.state[1])
-
-        self.old_alpha = alpha
-        self.old_mu = mu
+        if np.linalg.norm(self.state[0:2]-self.goal) < 6000 and self.state[2] > 0:
+            if self.state[2] <= 100 and np.linalg.norm(self.state[0:2]-self.goal) < 100:
+                reward = 1000
+                done = true
+            else:
+               reward = 100 * np.linalg.norm(self.state[0:2]-self.goal) / np.linalg.norm(self.init_pos[0:2]-self.goal)
+        elif not done:
+            reward = -1
+        else:
+            reward = -100
 
         return np.array(self.state), reward, done, {}
 
     def action_to_control(self,action):
-        assert(action >= 0 and action < 42)
+        assert(action >= 0 and action < 26*5)
 
-        alpha_list = np.array([0,5,10,15,20,25]) / 180.0 * np.pi
-        mu_list = np.array([-90,-60,-30,0,30,60,90]) / 180.0 * np.pi
+        alpha_list = np.array(range(26)) / 180.0 * np.pi
+        mu_list = np.array([-90,-45,0,45,90]) / 180.0 * np.pi
 
         #alpha_idx * mu_idx
-        alpha_idx = action / 7
-        mu_idx = action % 7
+        alpha_idx = action / 5
+        mu_idx = action % 5
 
         alpha = alpha_list[alpha_idx]
         mu = mu_list[mu_idx]
@@ -75,6 +73,7 @@ class Airplane_Env:
         self.Vw = 10.0
         self.chiw = 0.0
         self.traj = np.array([self.state])
+        self.controlls  = np.array([])
         return np.array(self.state, dtype=np.float32)
 
     def dynamics(self,state,alpha,mu):
@@ -110,6 +109,9 @@ class Airplane_Env:
     def get_traj(self):
         return self.traj
 
+    def get_controlls(self):
+        return self.controlls
+
     def plot_traj(self):
         fig = plt.figure()
         ax = plt.axes(projection='3d')
@@ -126,5 +128,5 @@ class Airplane_Env:
 
 if __name__ == "__main__":
     a = Airplane_Env()
-    for i in range(78):
+    for i in range(26*5):
         print(a.action_to_control(i))

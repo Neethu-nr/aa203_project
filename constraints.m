@@ -34,17 +34,22 @@ h_step = 1.0*T/(1.0*N);
 h_l_speed = -4;
 h_h_speed = 0.5;
 
+Snext = [x(1);y(1);h(1);V(1);gamma(1);chi(1)];
+dSnext = aircraft_dynamics(Snext,alpha(1),mu(1));
+
+
 for i = 1:N
     % Provide here dynamical constraints via the trapeziodal formula
     
-    S = [x(i);y(i);h(i);V(i);gamma(i);chi(i)];
+    S = Snext;
     Snext = [x(i+1);y(i+1);h(i+1);V(i+1);gamma(i+1);chi(i+1)];
     
-    dS = aircraft_dynamics(S,alpha(i),mu(i));
+    dS = dSnext;
+    dSnext = aircraft_dynamics(Snext,alpha(i+1),mu(i+1));
     
     indices = length(S)*(i-1)+1:length(S)*i;
     
-    ceq(indices) = Snext-S-h_step*dS;
+    ceq(indices) = Snext-S-h_step*(dS + dSnext)/2;
     
     h_dot = dS(3);
     

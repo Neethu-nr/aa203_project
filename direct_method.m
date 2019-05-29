@@ -32,11 +32,11 @@ global Vmin; Vmin = 56;
 
 guess = spline_guess([0;0;1000],[-5000;0;0],5,N,true);
 
-uInit = zeros(2*N,1); % Initialization on the control
+uInit = zeros(2*N+2,1); % Initialization on the control
 %uInit(N+1:end) = 0.1 * ones(N,1);
 sInit = ones(6*(N+1),1); % Initialization on the state
 
-if true
+if false
     sInit(1:6*N+6) = guess;
 else
     res = matfile('res.mat'); 
@@ -47,7 +47,7 @@ end
 
 varInit = [sInit;uInit];
 
-lb = zeros(8*N+6,1); ub = alphaMax*ones(8*N+6,1); % Lower and upper bounds. For the control: |u| \le uMax
+lb = zeros(8*N+8,1); ub = alphaMax*ones(8*N+8,1); % Lower and upper bounds. For the control: |u| \le uMax
 lb(1:6*N+6) = -1e5; ub(1:6*N+6) = 1e5; % For the state x : 0 \le x \le M
 lb(2*N+3:3*N+3) = zeros(N+1,1);
 lb(7*N+7:end) = -muMax; ub(7*N+7:end) = muMax; % For the state y : 0\le x \le l
