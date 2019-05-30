@@ -7,8 +7,13 @@ function guess = spline_guess(x0,xf,m,N,plot_status)
     t = pi:-dt:dt;
 
     x = dist / 2 * cos(t) - offset - 0.2 * dist * sin(t);
-    y = dist / 2 * sin(t).*sin(1/2*t).^m;
-    z = linspace(x0(3),xf(3),length(t));
+    y = 3000 * sin(t).*sin(1/2*t).^m;
+    
+    timestamp = [0 10 20 30 50 100 150 175];
+    h = [1000 1100 1000 750 700 375 100 0];
+    
+    z = spline(timestamp,h,linspace(0,175,length(t)));
+    
     
     dx = x(2:end) - x(1:end-1);
     dy = y(2:end) - y(1:end-1);

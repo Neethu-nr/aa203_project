@@ -14,7 +14,7 @@ global Vw;Vw = 10;    % Magnitude of wind in m/s
 global chiw;chiw = 0;  % Direction of wind in rad
 
 global N; N = 40; % Scenario
-global T; T = 165;
+global T; T = 175;
 global yf; yf = 0;
 global hf; hf = 0;
 global x0; x0 = 0;
@@ -30,13 +30,13 @@ global alphaMax; alphaMax = 25 / 180 * pi;
 global muMax; muMax = 90 / 180 * pi;
 global Vmin; Vmin = 56;
 
-guess = spline_guess([0;0;1000],[-5000;0;0],5,N,true);
+guess = spline_guess([0;0;1000],[-12500;0;0],4,N,true);
 
 uInit = zeros(2*N+2,1); % Initialization on the control
 %uInit(N+1:end) = 0.1 * ones(N,1);
 sInit = ones(6*(N+1),1); % Initialization on the state
 
-if false
+if true
     sInit(1:6*N+6) = guess;
 else
     res = matfile('res.mat'); 
@@ -52,7 +52,7 @@ lb(1:6*N+6) = -1e5; ub(1:6*N+6) = 1e5; % For the state x : 0 \le x \le M
 lb(2*N+3:3*N+3) = zeros(N+1,1);
 lb(7*N+7:end) = -muMax; ub(7*N+7:end) = muMax; % For the state y : 0\le x \le l
 
-options=optimoptions('fmincon','Display','iter','Algorithm','sqp','MaxFunctionEvaluations',30000,'ConstraintTolerance',1e-2);
+options=optimoptions('fmincon','Display','iter','Algorithm','sqp','MaxFunctionEvaluations',10000,'ConstraintTolerance',1e-2);
 [var,Fval,convergence] = fmincon(@cost,varInit,[],[],[],[],lb,ub,@constraints,options); % Solving the problem
 convergence % = 1, good
 
