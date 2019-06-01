@@ -39,14 +39,13 @@ gammanom=(spline(t,gammanom,t_desired))';
 chinom=(spline(t,chinom,t_desired))';
 alphanom=(spline(t,alphanom,t_desired))';
 munom=(spline(t,munom,t_desired))';
-figure;
-plot3(xnom,ynom,hnom);
+
 nomSate=[xnom';ynom';hnom';Vnom';gammanom';chinom'];
 nomControl=[alphanom';munom'];
 
 
-dt=0.1;
-iterations=100;
+dt=0.01;
+iterations=1000;
 % define all A and B matrices
 for i=1:iterations
     Acurr(:,:,i)=A_jac(xnom(i),ynom(i),hnom(i),Vnom(i),gammanom(i),chinom(i),alphanom(i),munom(i));
@@ -70,8 +69,7 @@ for i=1:iterations
 end
 minimize stateCost+controlCost
 %initial conditions
-xtraj(:,1)==[x0 ; y0; h0;
-    V0; gamma0; chi0];
+xtraj(:,1)==nomSate(:,1)
 S=[xnom(i),ynom(i),hnom(i),Vnom(i),gammanom(i),chinom(i)];
 U=[alphanom(i), munom(i)];
 for i=2:iterations
@@ -90,7 +88,7 @@ cvx_end
 
 
 %% plotting
-figure;plot3(xtraj(1,:),xtraj(2,:),xtraj(3,:));
-figure;plot3(nomSate(1,:),nomSate(2,:),nomSate(3,:));
+figure;plot3(xtraj(1,:),xtraj(2,:),xtraj(3,:));hold on;
+plot3(nomSate(1,:),nomSate(2,:),nomSate(3,:));
 
 

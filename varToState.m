@@ -1,5 +1,4 @@
-function [x,y,h,V,gamma,chi,alpha,mu] = ...
-    varToState(var)
+function [x,y,h,V,gamma,chi,alpha,mu] = varToState(var)
 
 global N
 
