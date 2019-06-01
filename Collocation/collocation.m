@@ -13,7 +13,7 @@ global rho_air;rho_air = 1.225 ;        % density of air in kg/m3
 global Vw;Vw = 10;    % Magnitude of wind in m/s
 global chiw;chiw = 0;  % Direction of wind in rad
 
-global N; N = 40; % Scenario
+global N; N = 20; % Scenario
 global T; T = 155;
 global yf; yf = 0;
 global hf; hf = 0;
@@ -43,6 +43,7 @@ else
     res = matfile('res.mat'); 
     var = res.var;
     sInit(1:6*N+6) = var((1:6*N+6));
+    uInit(:) = var(6*N+7:end);
 end
 
 

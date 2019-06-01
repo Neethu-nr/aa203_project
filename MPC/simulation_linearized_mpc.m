@@ -9,7 +9,7 @@ global mE;mE = 5.972*1e24;             %mass earth in kg
 global rho_air;rho_air = 1.225 ;        % density of air in kg/m3
 
 % Wind parameters
-global Vw;Vw = 0;    % Magnitude of wind in m/s
+global Vw;Vw = 10;    % Magnitude of wind in m/s
 global chiw;chiw = 0;  % Direction of wind in rad
 
 % Control values
@@ -26,26 +26,15 @@ S0 = [x0 ; y0; h0;
 
 % Nominal controls and trajectory
 [xnom,ynom,hnom,Vnom,gammanom,chinom,alphanom,munom]=varToState(var);
-
-
-%spline;
-t=0:(155/40):155; 
-t_desired=0:0.1:155;
-xnom=(spline(t,xnom,t_desired))';
-ynom=(spline(t,ynom,t_desired))';
-hnom=(spline(t,hnom,t_desired))';
-Vnom=(spline(t,Vnom,t_desired))';
-gammanom=(spline(t,gammanom,t_desired))';
-chinom=(spline(t,chinom,t_desired))';
-alphanom=(spline(t,alphanom,t_desired))';
-munom=(spline(t,munom,t_desired))';
-
 nomSate=[xnom';ynom';hnom';Vnom';gammanom';chinom'];
 nomControl=[alphanom';munom'];
 
+% step by step trajectory update
+xtraj(:,1)=[x0 ; y0; h0;
+    V0; gamma0; chi0];
 
-dt=0.01;
-iterations=1000;
+dt=0.1;
+iterations=40;
 % define all A and B matrices
 for i=1:iterations
     Acurr(:,:,i)=A_jac(xnom(i),ynom(i),hnom(i),Vnom(i),gammanom(i),chinom(i),alphanom(i),munom(i));
@@ -69,10 +58,11 @@ for i=1:iterations
 end
 minimize stateCost+controlCost
 %initial conditions
-xtraj(:,1)==nomSate(:,1)
+xtraj(:,1)==[x0 ; y0; h0;
+    V0; gamma0; chi0];
 S=[xnom(i),ynom(i),hnom(i),Vnom(i),gammanom(i),chinom(i)];
 U=[alphanom(i), munom(i)];
-for i=2:iterations
+for i=2:6
     Gnom=nomSate(:,i)-nomSate(:,i-1)+dt*aircraft_dynamics(nomSate(:,i-1), nomControl(1,i-1), nomControl(2,i-1))-dt*Acurr(:,:,i-1)*nomSate(:,i-1)...
         -dt*Bcurr(:,:,i-1)*nomControl(:,i-1);
     xtraj(:,i)==Gnom+dt*Acurr(:,:,i-1)*xtraj(:,i-1)+xtraj(:,i-1)+ dt*Bcurr(:,:,i-1)*utraj(:,i-1);
@@ -88,7 +78,7 @@ cvx_end
 
 
 %% plotting
-figure;plot3(xtraj(1,:),xtraj(2,:),xtraj(3,:));hold on;
-plot3(nomSate(1,:),nomSate(2,:),nomSate(3,:));
+figure;plot3(xtraj(1,:),xtraj(2,:),xtraj(3,:));
+figure;plot3(nomSate(1,:),nomSate(2,:),nomSate(3,:));
 
 

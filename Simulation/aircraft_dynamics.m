@@ -1,4 +1,4 @@
-function dS = aircraft_dynamics(S, alpha, mu)
+function dS = aircraft_dynamics(S, u)
   
     global W;
     global Surface_area;
@@ -10,6 +10,9 @@ function dS = aircraft_dynamics(S, alpha, mu)
     % Wind parameters
     global Vw;    
     global chiw;
+    
+    alpha = u(1);
+    mu = u(2);
 
     x = S(1); y = S(2); h = S(3);
     V = S(4);gamma = S(5);chi= S(6);

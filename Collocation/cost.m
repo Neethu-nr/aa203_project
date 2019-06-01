@@ -14,4 +14,4 @@ xyz = [x';y'];
 dxyz = xyz(:,2:end) - xyz(:,1:end-1);
 dxyz = sum(norms(dxyz,2));
 
-c = x(end) + dxyz ;
+c = -x(end) + dxyz ;
