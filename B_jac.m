@@ -1,9 +1,13 @@
 function B_jac=B_jac(x,y,h,V,gamma,chi,alpha,mu)
 
-global g;
+global mu_g;
+global rE;
+global mE;
 global W;
 global Surface_area;
 global rho_air; 
+
+g = mu_g*mE/((rE + h)*(rE + h));
 
 %L,D,mu
 dalpha=1e-10;
@@ -12,16 +16,10 @@ dalpha=1e-10;
 dDalpha=(dCD-CD)/dalpha;
 dLalpha=(dCL-CL)/dalpha;
 
-g=9.81;
-global W;
-global g;
-global Surface_area;
-global rho_air;
-
-qs=0.5*rho_air*V*V*Surface_area;
-[CL CD]=find_coeff(alpha);
-L=CL*qs;
-D=CD*qs;
+qS = 0.5 * rho_air * V*V * Surface_area;
+[CL, CD] = find_coeff(alpha);
+L = CL * qS;
+D = CD * qS;
 
 B1 = [0,0];
 B2 = [0,0];
