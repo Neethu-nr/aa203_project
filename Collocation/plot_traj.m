@@ -12,6 +12,6 @@ for i = 1:length(x)
     
 end
 
-axis equal
+axis([-2500 15000 -3000 3000 0 1500])
 
 end

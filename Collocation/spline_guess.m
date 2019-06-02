@@ -7,7 +7,7 @@ function guess = spline_guess(x0,xf,m,N,plot_status)
     t = pi:-dt:dt;
 
     x = dist / 2 * cos(t) - offset - 0.2 * dist * sin(t);
-    y = dist /2 * sin(t).*sin(1/2*t).^m;
+    y = 3000 * sin(t).*sin(1/2*t).^m;
     z = linspace(x0(3),xf(3),length(t));
     
     dx = x(2:end) - x(1:end-1);
@@ -51,7 +51,6 @@ function guess = spline_guess(x0,xf,m,N,plot_status)
         hold on
         plot3(x,y,z,'r')
         plot3(x_sample,y_sample,z_sample,'.')
-        axis equal
     
     end
     
