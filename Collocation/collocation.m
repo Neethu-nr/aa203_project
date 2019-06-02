@@ -2,7 +2,7 @@ clf; clc; format long;
 close all;
 clear
 
-load_data = true;
+load_data = false;
 notification = false;
 
 %% Initialize varialbes

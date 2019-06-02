@@ -21,7 +21,7 @@ nomControl = res.nomControl;
 t_desired = res.t_desired;
 dt = res.dt;
 
-mpc_horizon=10;
+mpc_horizon=3;
 mpc_steps = 100;
 
 aircraft_state = zeros(6,mpc_steps+1);
