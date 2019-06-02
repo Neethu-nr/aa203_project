@@ -3,19 +3,19 @@ clear
 clc
 
 % Global values
-global W;W = 9200;                % Weight of aircraft in kg
+global W;W = 91200;                % Weight of aircraft in kg
 global Surface_area;Surface_area =27.87;                % Surface area of wings in m.sq
-global rho_air;rho_air = 1.225 ;        % density of air in kg/m3
 global mu_g;mu_g = 6.67384e-11;      % gravitational constant in m.3kg.-1s.-2
 global rE;rE = 6.3781*1e6;             %in radius of earth in m
 global mE;mE = 5.972*1e24;             %mass earth in kg
-global N;N=40;
 
 % Wind parameters
-global Vw;Vw = 10;    % Magnitude of wind in m/s
+global Vw;Vw = 0;    % Magnitude of wind in m/s
 global chiw;chiw = 0;  % Direction of wind in rad
 
 res = matfile('res.mat');
+global N;N=res.N;
+global T;T=res.T;
 
 % Nominal controls and trajectory
 [xnom,ynom,hnom,Vnom,gammanom,chinom,alphanom,munom]=varToState(res.var);
@@ -24,8 +24,8 @@ res = matfile('res.mat');
 %spline;
 
 dt=0.01;
-t=0:(155/40):155; 
-t_desired=0:dt:155;
+t=0:(T/N):T; 
+t_desired=0:dt:T;
 xnom=(spline(t,xnom,t_desired))';
 ynom=(spline(t,ynom,t_desired))';
 hnom=(spline(t,hnom,t_desired))';
@@ -48,3 +48,6 @@ for i=1:length(t_desired)
 end
 
 save('nom_traj.mat','Acurr','Bcurr','nomSate','nomControl','t_desired','dt')
+figure;
+hold on;
+plot3(nomSate(1,1:end),nomSate(2,1:end),nomSate(3,1:end),'m--');

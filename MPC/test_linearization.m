@@ -1,15 +1,14 @@
 clear
 clc
 
-global W;W = 9200;                % Weight of aircraft in kg
+global W;W = 91200;                % Weight of aircraft in kg
 global Surface_area;Surface_area =27.87;                % Surface area of wings in m.sq
 global mu_g;mu_g = 6.67384e-11;      % gravitational constant in m.3kg.-1s.-2
 global rE;rE = 6.3781*1e6;             %in radius of earth in m
-global mE;mE = 5.972*1e24;             %mass earth in kg
-global rho_air;rho_air = 1.225 ;        % density of air in kg/m3 
+global mE;mE = 5.972*1e24;             %mass earth in kg       % density of air in kg/m3 
 
 % Wind parameters
-global Vw;Vw = 10;    % Magnitude of wind in m/s
+global Vw;Vw = 0;    % Magnitude of wind in m/s
 global chiw;chiw = 0;  % Direction of wind in rad
 
 %%
@@ -17,7 +16,7 @@ global chiw;chiw = 0;  % Direction of wind in rad
 
 x0 = [0,0,1000,100,0.26,pi]';
 
-x = [0,0,1500,115,0.1,pi+0.1]';
+x = [0,0,2000,100,0.26,pi]';
 
 dt = 0.01;
 
@@ -40,9 +39,9 @@ close all
 alpha = 0; % angle of attack in radians
 mu = 0.1;   % rolling angle in radians
 
-dt = 1;
+dt = 0.01;
 
-tspan = 0:dt:100;
+tspan = 0:dt:10;
 %tspan = [0 100];
 
 % initial conditions
@@ -60,7 +59,7 @@ test(1,:) = S0;
 
 for i = 1:length(tspan)-1
    
-    S(i+1,:) = S(i,:) + dt * aircraft_dynamics(S(i,:),alpha,mu+0.001*i)';
+    S(i+1,:) = S(i,:) + dt * aircraft_dynamics(S(i,:),alpha,mu+0.0001*i)';
     
 end
 
@@ -69,7 +68,7 @@ i = 0;
 for idx = 1:4:length(tspan)-1
    
     i = i + 1;
-    A = A_jac(S(idx,1),S(idx,2),S(idx,3),S(idx,4),S(idx,5),S(idx,6),alpha,mu+0.001*idx);
+    A = A_jac(S(idx,1),S(idx,2),S(idx,3),S(idx,4),S(idx,5),S(idx,6),alpha,mu+0.0001*i);
     f0 = aircraft_dynamics(S(idx,:),alpha,mu);
     f_tilde = f0 + A*(test(i,:)-S(idx,:))';
     test(i+1,:) = test(i,:) + 4*dt*f_tilde';

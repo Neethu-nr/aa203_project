@@ -21,15 +21,19 @@ nomControl = res.nomControl;
 t_desired = res.t_desired;
 dt = res.dt;
 
-iterations=10000;
-mpc_steps = 1;
+mpc_horizon=10;
+mpc_steps = 100;
 
 aircraft_state = zeros(6,mpc_steps+1);
 aircraft_state(:,1) = nomSate(:,1);
-control_dt = 0.1;
+control_dt = 0.01;
 
-Q = diag([1 1 1 1 1 1]);
+Q = eye(6);
 Qhalf = sqrtm(Q);
+R = 1000*eye(2);
+Rhalf = sqrtm(R);
+H = 1000*eye(6);
+Hhalf = sqrtm(H);
 
 for step = 0:mpc_steps-1
     
@@ -40,12 +44,17 @@ for step = 0:mpc_steps-1
 
     cvx_quiet True
     cvx_begin
-    variables xtraj(6,iterations) utraj(2,iterations-1)
-    for i=1:iterations
+    variables xtraj(6,mpc_horizon) utraj(2,mpc_horizon-1)
+    for i=1:mpc_horizon
         
-        idx = i+step;
-
-        stateCost=stateCost+norm(Qhalf*(xtraj(:,i)-nomSate(:,idx)),'fro');
+        idx = i+round(control_dt/dt)*step;
+        
+        if i < mpc_horizon
+            stateCost=stateCost+norm(Qhalf*(xtraj(:,i)-nomSate(:,idx)),'fro');
+            controlCost=controlCost+norm(Rhalf*(utraj(:,i)-nomControl(:,idx)),'fro');
+        else
+            stateCost=stateCost+norm(Hhalf*(xtraj(:,i)-nomSate(:,idx)),'fro');
+        end
 
     end
     minimize stateCost+controlCost
@@ -54,8 +63,8 @@ for step = 0:mpc_steps-1
     
         xtraj(:,1)==aircraft_state(:,1+step)
 
-    for i=1:iterations-1
-        idx = i+step;
+    for i=1:mpc_horizon-1
+        idx = i+round(control_dt/dt)*step;
         x_bar_1 = nomSate(:,idx+1);
         x_bar = nomSate(:,idx);
         u_bar = nomControl(:,idx);
@@ -74,8 +83,16 @@ for step = 0:mpc_steps-1
         
     cvx_end
     
-    [~,state] = ode45(@(t,S) aircraft_dynamics(S,utraj(1,1),utraj(2,1)),[0 control_dt],aircraft_state(:,step+1));
-    aircraft_state(:,step+2) = state(end,:);
+    sim_dt=0.01;
+    sim_time = 0:sim_dt:control_dt;
+    state = zeros(size(aircraft_state,1),length(sim_time));
+    state(:,1) = aircraft_state(:,step+1);
+    
+    for i = 1:length(sim_time)
+        state(:,i+1)=state(:,i)+sim_dt*aircraft_dynamics(state(:,i),utraj(1,1),utraj(2,1));
+    end
+    
+    aircraft_state(:,step+2) = state(:,end);
 
 end
 
@@ -85,6 +102,6 @@ end
 % plotting
 figure;
 hold on;
-plot3(nomSate(1,1:end),nomSate(2,1:end),nomSate(3,1:end),'m--');
+plot3(nomSate(1,1:400),nomSate(2,1:400),nomSate(3,1:400),'m--');
 plot3(xtraj(1,:),xtraj(2,:),xtraj(3,:),'r');
 plot3(aircraft_state(1,:),aircraft_state(2,:),aircraft_state(3,:),'b-.')
