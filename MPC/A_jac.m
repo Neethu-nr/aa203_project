@@ -2,35 +2,68 @@ function A = A_jac(x,y,h,V,gamma,chi,alpha,mu)
 
     global W;
     global Surface_area;
-    global rho_air; 
     global mu_g;
     global rE;
     global mE;
     
     g = mu_g*mE/((rE + h)*(rE + h));
-    dgdh = -2*mu_g*mE/(rE + h)^3;
     
     % Drag and Lift calculation
+    rho_air = rho_air_calc(h);
     qS = 0.5 * rho_air * V*V * Surface_area;
     [CL, CD] = find_coeff(alpha);
     L = CL * qS;
     D = CD * qS;
     
+    dt = 1e-4;
+    dgdh = -2*mu_g*mE/(rE + h)^3;
+    drhodh = (rho_air_calc(h+dt) - rho_air_calc(h))/dt;
+    
     dLdV = CL * rho_air *V * Surface_area;
     dDdV = CD * rho_air *V * Surface_area;
+    
+    dLdh = CL * 0.5 * drhodh * V*V * Surface_area;
+    dDdh = CD * 0.5 * drhodh * V*V * Surface_area;
+    
+    A11 = 0; A12 = 0; A13 = 0;
+    A14 = cos(gamma)*cos(chi);
+    A15 = -V*sin(gamma)*cos(chi);
+    A16 = -V*cos(gamma)*sin(chi);
+    
+    A21 = 0; A22 = 0; A23 = 0;
+    A24 = cos(gamma)*sin(chi);
+    A25 = -V*sin(gamma)*sin(chi);
+    A26 = V*cos(gamma)*cos(chi);
+    
+    A31 = 0; A32 = 0; A33 = 0;
+    A34 = sin(gamma);
+    A35 = V*cos(gamma);
+    A36 = 0;
+    
+    A41 = 0; A42 = 0;
+    A43 = -dgdh/W*(D+W*sin(gamma))-dDdh*g/W;
+    A44 = -g*dDdV/W;
+    A45 = -g*cos(gamma);
+    A46 = 0;
+    
+    A51 = 0; A52 = 0;
+    A53 = dgdh/V*(L/W*cos(mu)-cos(gamma))+g*dLdh/V/W*cos(mu);
+    A54 = -g/V^2*(L/W*cos(mu)-cos(gamma))+g/V*dLdV/W*cos(mu);
+    A55 = g/V*sin(gamma);
+    A56 = 0;
+    
+    A61 = 0; A62 = 0;
+    A63 = sin(mu)/(V*cos(gamma)*W)*(dgdh*L+g*dLdh);
+    A64 = g/cos(gamma)*sin(mu)/W*(dLdV/V-L/V^2);
+    A65 = g/V*L/W*sin(mu)*sin(gamma)/cos(gamma)^2;
+    A66 = 0;
+    
+    A = [A11 A12 A13 A14 A15 A16;
+         A21 A22 A23 A24 A25 A26;
+         A31 A32 A33 A34 A35 A36;
+         A41 A42 A43 A44 A45 A46;
+         A51 A52 A53 A54 A55 A56;
+         A61 A62 A63 A64 A65 A66];
 
-    A1=[0 0 0 cos(gamma)*cos(chi) -V*cos(chi)*sin(gamma) -V*cos(gamma)*sin(chi)];
-    
-    A2=[0 0 0 cos(gamma)*sin(chi) -V*sin(gamma)*sin(chi) V*cos(gamma)*cos(chi)];
-    
-    A3=[0 0 0 sin(gamma) V*cos(gamma) 0];
-    
-    A4=[0 0 dgdh/W*(-D-W*sin(gamma)) -g/W*dDdV -g*cos(gamma) 0];
-    
-    A5=[0 0 dgdh/V*(L/W*cos(mu)-cos(gamma)) g/V*dLdV/W*cos(mu)-g*(L/W*cos(mu)-cos(gamma))/V^2 g/V*sin(gamma) 0];
-    
-    A6=[0 0 dgdh*L/V/W*sin(mu)/cos(gamma) g*dLdV/W*sin(mu)/(V*cos(gamma))-g*L/W*sin(mu)/(V^2*cos(gamma)) g*L/W/V*sin(mu)/cos(gamma)^2*sin(gamma) 0];
-
-    A = [A1;A2;A3;A4;A5;A6];
 
 end
