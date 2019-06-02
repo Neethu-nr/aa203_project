@@ -9,8 +9,6 @@ global h0;
 global V0;
 global gamma0;
 global chi0;
-global alpha0;
-global mu0;
 
 global yf;
 global hf;
@@ -109,7 +107,5 @@ ceq(6+6*N) = gamma(1) - gamma0;
 ceq(7+6*N) = y(end) - yf;
 ceq(8+6*N) = h(end) - hf;
 ceq(9+6*N) = chi(end) - chif;
-ceq(10+6*N) = mu(1) - mu0;
-ceq(11+6*N) = alpha(1) - alpha0;
 
 end

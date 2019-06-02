@@ -3,6 +3,7 @@ close all;
 clear
 
 load_data = true;
+notification = false;
 
 %% Initialize varialbes
 
@@ -26,8 +27,6 @@ global h0; h0 = 1000;
 global V0; V0 = 100;
 global gamma0; gamma0 = 0.26;
 global chi0; chi0 = pi;
-global alpha0;alpha0 = 0.25;
-global mu0;mu0 = 0;
 
 %Final constraints
 global yf; yf = 0;
@@ -40,7 +39,7 @@ global muMax; muMax = 90 / 180 * pi;
 
 global Vmin; Vmin = 56;
 
-guess = spline_guess([0;0;1000],[-12600;0;0],5,N,true);
+guess = spline_guess([0;0;1000],[-12600;0;0],2,N,true);
 
 uInit = zeros(2*N+2,1); % Initialization on the control
 sInit = ones(6*(N+1),1); % Initialization on the state
@@ -48,6 +47,7 @@ sInit = ones(6*(N+1),1); % Initialization on the state
 %Initialize state/control
 if ~load_data
     sInit(1:6*N+6) = guess;
+    disp('Guess solution')
 else
     disp('Load data')
     res = matfile('res.mat'); 
@@ -59,14 +59,14 @@ end
 varInit = [sInit;uInit];
 
 %% Bounds on variables
-lb = zeros(8*N+8,1); ub = alphaMax*ones(8*N+8,1);  \le uMax
+lb = zeros(8*N+8,1); ub = alphaMax*ones(8*N+8,1);
 lb(1:6*N+6) = -1e5; ub(1:6*N+6) = 1e5; 
 lb(2*N+3:3*N+3) = zeros(N+1,1);
 lb(7*N+8:end) = -muMax; ub(7*N+8:end) = muMax; 
 
 %% Optimizing
 
-options=optimoptions('fmincon','Display','iter','Algorithm','sqp','MaxFunctionEvaluations',30000,'ConstraintTolerance',1e-1);
+options=optimoptions('fmincon','Display','iter','Algorithm','sqp','MaxFunctionEvaluations',30000,'ConstraintTolerance',1e-2);
 [var,Fval,convergence] = fmincon(@cost,varInit,[],[],[],[],lb,ub,@constraints,options); % Solving the problem
 convergence % = 1, good
 
@@ -75,6 +75,37 @@ save('res.mat','var','N','T');
 %% Plot trajectory
 
 plot_traj(var)
-%Notification
-load gong.mat;
-sound(y);
+[x,y,h,V,gamma,chi,alpha,mu] = varToState(var);
+t = 0:T/N:T;
+figure
+plot(x,y)
+xlabel('x')
+ylabel('y')
+
+figure
+plot(t,h)
+xlabel('time')
+title('h')
+
+figure
+plot(t,V)
+xlabel('time')
+title('V')
+
+figure
+plot(t,gamma)
+xlabel('time')
+title('\gamma')
+
+figure
+plot(t,chi)
+xlabel('time')
+title('\chi')
+
+
+%% Notification
+
+if notification
+    load gong.mat;
+    sound(y);
+end
