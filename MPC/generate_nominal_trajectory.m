@@ -23,7 +23,7 @@ global T;T=res.T;
 
 %spline;
 
-dt=0.01;
+dt=0.1;
 t=0:(T/N):T; 
 t_desired=0:dt:T;
 xnom=(spline(t,xnom,t_desired))';
@@ -35,19 +35,25 @@ chinom=(spline(t,chinom,t_desired))';
 alphanom=(spline(t,alphanom,t_desired))';
 munom=(spline(t,munom,t_desired))';
 
-nomSate=[xnom';ynom';hnom';Vnom';gammanom';chinom'];
+nomState=[xnom';ynom';hnom';Vnom';gammanom';chinom'];
 nomControl=[alphanom';munom'];
 
 % define all A and B matrices
 Acurr = zeros(6,6,length(t_desired));
 Bcurr = zeros(6,2,length(t_desired));
+size(Acurr)
 
 for i=1:length(t_desired)
+    if mod(i,100)==0
+       disp(i) 
+    end
     Acurr(:,:,i)=A_jac(xnom(i),ynom(i),hnom(i),Vnom(i),gammanom(i),chinom(i),alphanom(i),munom(i));
     Bcurr(:,:,i)=B_jac(xnom(i),ynom(i),hnom(i),Vnom(i),gammanom(i),chinom(i),alphanom(i),munom(i));
 end
 
-save('nom_traj.mat','Acurr','Bcurr','nomSate','nomControl','t_desired','dt')
+disp("Done")
+
+save('nom_traj.mat','Acurr','Bcurr','nomState','nomControl','t_desired','dt')
 figure;
 hold on;
-plot3(nomSate(1,1:end),nomSate(2,1:end),nomSate(3,1:end),'m--');
+plot3(nomState(1,1:end),nomState(2,1:end),nomState(3,1:end),'m--');
