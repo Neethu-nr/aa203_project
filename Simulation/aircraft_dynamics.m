@@ -5,7 +5,6 @@ function dS = aircraft_dynamics(S, u)
     global mu_g;
     global rE;
     global mE;
-    global rho_air; 
     
     % Wind parameters
     global Vw;    
@@ -19,6 +18,7 @@ function dS = aircraft_dynamics(S, u)
     g = mu_g*mE/((rE + h)*(rE + h));
     
     % Drag and Lift calculation
+    rho_air = rho_air_calc(h);
     qS = 0.5 * rho_air * V*V * Surface_area;
     [CL, CD] = find_coeff(alpha);
     L = CL * qS;
