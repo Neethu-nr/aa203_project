@@ -22,19 +22,20 @@ t_desired = res.t_desired;
 dt = res.dt;
 
 mpc_horizon=10;
-mpc_steps = 1500;
+mpc_steps = 50;
+start = 0;
 
 aircraft_state = zeros(6,mpc_steps+1);
 aircraft_control = zeros(2,mpc_steps);
-aircraft_state(:,1) = nomState(:,1);
+aircraft_state(:,1) = nomState(:,1+start);
 control_dt = 0.1;
 
-Q = diag([1 1 1 1 1 1]);
+Q = diag([1 1 10 10 10 10]);
 Qhalf = sqrtm(Q);
-R = diag([10 30]);
+R = diag([100 300]);
 Rhalf = sqrtm(R);
 
-for step = 0:mpc_steps-1
+for step = start:mpc_steps-1+start
     
     disp(step+1);
     
@@ -43,7 +44,7 @@ for step = 0:mpc_steps-1
 
     cvx_quiet True
     cvx_begin
-    variables xtraj(6,mpc_horizon) utraj(2,mpc_horizon-1)
+    variables xtraj(6,mpc_horizon) utraj(2,mpc_horizon-1) thr(1,mpc_horizon-1)
     for i=1:mpc_horizon
         
         idx = i+round(control_dt/dt)*step;
@@ -58,8 +59,8 @@ for step = 0:mpc_steps-1
     
     subject to
     
-        xtraj(:,1)==aircraft_state(:,1+step)
-        xtraj(4,:) >= 0
+        xtraj(:,1)==aircraft_state(:,1+step-start)
+        xtraj(3,:) >= 0
 
     for i=1:mpc_horizon-1
         idx = i+round(control_dt/dt)*step;
@@ -71,7 +72,7 @@ for step = 0:mpc_steps-1
         B_bar = Bcurr(:,:,idx);
         G_bar=x_bar_1-x_bar+dt*(f_bar-A_bar*x_bar-B_bar*u_bar);
         
-        xtraj(:,i+1)==G_bar+dt*A_bar*xtraj(:,i)+xtraj(:,i)+ dt*B_bar*utraj(:,i);
+        xtraj(:,i+1)==G_bar+dt*A_bar*xtraj(:,i)+xtraj(:,i)+ dt*B_bar*utraj(:,i) + dt*[0;0;0;1;0;0]*thr(:,i);
         utraj(1,i)<=0.4363;
         utraj(1,i)>=-0.4363;
         utraj(2,i)<=pi/2;
@@ -83,20 +84,20 @@ for step = 0:mpc_steps-1
     
     sim_time = 0:dt:control_dt;
     state = zeros(size(aircraft_state,1),length(sim_time));
-    state(:,1) = aircraft_state(:,step+1);
+    state(:,1) = aircraft_state(:,step+1-start);
     
     %Add noisey wind
     %a = 0.005;
     %Vw = 2*a*rand()-a;
     
-    for i = 1:length(sim_time)
+    for i = 1:length(sim_time)-1
         state(:,i+1)=state(:,i)+dt*aircraft_dynamics(state(:,i),utraj(1,1),utraj(2,1));
     end
     
     %Vw = 0;
     
-    aircraft_state(:,step+2) = state(:,end);
-    aircraft_control(:,step+1) = [utraj(1,1);utraj(2,1)];
+    aircraft_state(:,step+2-start) = state(:,end);
+    aircraft_control(:,step+1-start) = [utraj(1,1);utraj(2,1)];
 
 end
 
@@ -104,11 +105,18 @@ end
 
 
 %% plotting
-
+close all
 save('mpc_res','aircraft_state','aircraft_control');
 
 figure;
 hold on;
 plot3(nomState(1,1:end),nomState(2,1:end),nomState(3,1:end),'m--');
-plot3(aircraft_state(1,:),aircraft_state(2,:),aircraft_state(3,:),'r')
-%plot3(xtraj(1,:),xtraj(2,:),xtraj(3,:),'b-.')
+plot3(aircraft_state(1,1:700),aircraft_state(2,1:700),aircraft_state(3,1:700),'r','MarkerSize',1.3)
+for i = 1:50:length(nomState)
+    x = nomState(1,i);
+    y = nomState(2,i);
+    h = nomState(3,i);
+    plot3([x x],[y y],[0 h],'k');
+end
+title('MPC tracking with noise (random wind speed)')
+legend('Nominal trajectory','MPC')
