@@ -54,6 +54,30 @@ end
 disp("Done")
 
 save('nom_traj.mat','Acurr','Bcurr','nomState','nomControl','t_desired','dt')
+
+%% Plot
 figure;
 hold on;
 plot3(nomState(1,1:end),nomState(2,1:end),nomState(3,1:end),'m--');
+airplane_simulator(@aircraft_dynamics,dt,nomControl,nomState(:,1),dt)
+
+
+%% plot linearized dynamics
+% xlin=zeros(size(nomState));
+% xlin(:,1) = nomState(:,1);
+% 
+% for i = 1:length(t_desired)-1
+%    
+%     x_bar_1 = nomState(:,i+1);
+%     x_bar = nomState(:,i);
+%     u_bar = nomControl(:,i);
+%     f_bar = aircraft_dynamics(x_bar,u_bar(1),u_bar(2));
+%     A_bar = Acurr(:,:,i);
+%     B_bar = Bcurr(:,:,i);
+%     G_bar=x_bar_1-x_bar+dt*(f_bar-A_bar*x_bar-B_bar*u_bar);
+% 
+%     xlin(:,i+1)=G_bar+dt*A_bar*xlin(:,i)+xlin(:,i)+ dt*B_bar*u_bar;
+%     
+% end
+% 
+% plot3(xlin(1,1:end),xlin(2,1:end),xlin(3,1:end),'b-.')

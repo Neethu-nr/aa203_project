@@ -10,7 +10,7 @@ function B=B_jac(x,y,h,V,gamma,chi,alpha,mu)
 %     g = mu_g*mE/((rE + h)*(rE + h));
 %     
 %     %L,D,mu
-%     dalpha=1e-4;
+%     dalpha=1e-2;
 %     [dCL, dCD]=find_coeff(alpha+dalpha);
 %     [CL, CD]=find_coeff(alpha);
 %     dDalpha=(dCD-CD)/dalpha;
@@ -31,12 +31,14 @@ function B=B_jac(x,y,h,V,gamma,chi,alpha,mu)
 %     B_jac = [B1;B2;B3;B4;B5;B6]
 
     % --- Numerical derivative ---
-    dt = 1e-8;
+    dt = 1e-6;
     S = [x,y,h,V,gamma,chi]';
     B1 = (aircraft_dynamics(S,alpha+dt,mu)-aircraft_dynamics(S,alpha-dt,mu))/(2*dt);
 
     B2 = (aircraft_dynamics(S,alpha,mu+dt)-aircraft_dynamics(S,alpha,mu-dt))/(2*dt);
     
     B = [B1 B2];
+    
+    %assert(norm(B-B_jac) < 1e-3)
 
 end

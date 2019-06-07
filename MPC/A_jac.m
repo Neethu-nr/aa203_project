@@ -67,7 +67,7 @@ function A = A_jac(x,y,h,V,gamma,chi,alpha,mu)
          A51 A52 A53 A54 A55 A56;
          A61 A62 A63 A64 A65 A66];
 
-%--- Numerical derivative ---
+% --- Numerical derivative ---
 %     dt = 1e-8;
 %     S = [x,y,h,V,gamma,chi]';
 %     dS = [x+dt,y,h,V,gamma,chi]';
@@ -88,6 +88,8 @@ function A = A_jac(x,y,h,V,gamma,chi,alpha,mu)
 %     dS = [x,y,h,V,gamma,chi+dt]';
 %     A6 = (aircraft_dynamics(dS,alpha,mu)-aircraft_dynamics(S,alpha,mu))/dt;
 %     
-%     A = [A1 A2 A3 A4 A5 A6]
+%     A2 = [A1 A2 A3 A4 A5 A6];
+%     
+%     assert(norm(A-A2)<1e-5)
 
 end
