@@ -39,7 +39,7 @@ global muMax; muMax = 90 / 180 * pi;
 
 global Vmin; Vmin = 56;
 
-guess = spline_guess([0;0;1000],[-12600;0;0],2,N,true);
+guess = spline_guess([0;0;1000],[-15000;0;0],2,N,true);
 
 uInit = zeros(2*N+2,1); % Initialization on the control
 sInit = ones(6*(N+1),1); % Initialization on the state
@@ -66,7 +66,7 @@ lb(7*N+8:end) = -muMax; ub(7*N+8:end) = muMax;
 
 %% Optimizing
 
-options=optimoptions('fmincon','Display','iter','Algorithm','sqp','MaxFunctionEvaluations',30000,'ConstraintTolerance',1e-2);
+options=optimoptions('fmincon','Display','iter','Algorithm','sqp','MaxFunctionEvaluations',100000,'ConstraintTolerance',1e-3);
 [var,Fval,convergence] = fmincon(@cost,varInit,[],[],[],[],lb,ub,@constraints,options); % Solving the problem
 convergence % = 1, good
 
