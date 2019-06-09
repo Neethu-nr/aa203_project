@@ -22,7 +22,7 @@ t_desired = res.t_desired;
 dt = res.dt;
 
 mpc_horizon=10;
-mpc_steps = 1000;
+mpc_steps = 1720;
 start = 0;
 
 aircraft_state = zeros(6,mpc_steps+1);
@@ -100,6 +100,7 @@ for step = start:mpc_steps-1+start
         dt*aircraft_dynamics(aircraft_state_no_mpc(:,step+1-start),nomControl(1,step+1-start),nomControl(2,step+1-start));
   
     Vw = 0;
+    chiw = 0;
     
     time = time + toc;
     fprintf("Iteration %d, average time: %.1f, time left: %.1f.\n",step+1,time/(step+1-start),(mpc_steps/(step+1-start)-1)*time)
@@ -107,16 +108,28 @@ for step = start:mpc_steps-1+start
 end
 
 
-
+save('mpc_res','aircraft_state','aircraft_state_no_mpc','nomState');
 
 %% plotting
 close all
-save('mpc_res','aircraft_state','aircraft_control');
 
 figure;
 hold on;
-plot3(nomState(1,1:200),nomState(2,1:200),nomState(3,1:200),'m--');
-plot3(aircraft_state_no_mpc(1,:),aircraft_state_no_mpc(2,:),aircraft_state_no_mpc(3,:),'k--');
-plot3(aircraft_state(1,:),aircraft_state(2,:),aircraft_state(3,:),'b','MarkerSize',1.3)
-title('MPC tracking with noise (random wind speed)')
-legend('Nominal trajectory','Without MPC', 'MPC')
+plot3(nomState(1,:),nomState(2,:),nomState(3,:),'c','linewidth',1.5);
+plot3(aircraft_state_no_mpc(1,:),aircraft_state_no_mpc(2,:),aircraft_state_no_mpc(3,:),'r--','linewidth',1.3);
+plot3(aircraft_state(1,:),aircraft_state(2,:),aircraft_state(3,:),'k--','linewidth',1.3)
+title('MPC tracking with noise (random wind speed)','fontsize',18)
+
+for i = round(linspace(1,length(aircraft_state),40))
+   
+    %plot3([nomState(1,i) nomState(1,i)],[nomState(2,i) nomState(2,i)],[0 nomState(3,i)],'g')
+    %plot3([aircraft_state_no_mpc(1,i) aircraft_state_no_mpc(1,i)],[aircraft_state_no_mpc(2,i) aircraft_state_no_mpc(2,i)],[0 aircraft_state_no_mpc(3,i)],'r')
+    plot3([aircraft_state(1,i) aircraft_state(1,i)],[aircraft_state(2,i) aircraft_state(2,i)],[0 aircraft_state(3,i)],'k')
+    
+end
+legend('Nominal trajectory','Without MPC', 'MPC','fontsize',16)
+xlabel('x','fontsize',16)
+ylabel('y','fontsize',16)
+zlabel('h','fontsize',16)
+
+
